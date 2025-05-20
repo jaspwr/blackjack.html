@@ -72,6 +72,11 @@
 	const dealButton = document.getElementById("deal");
 	const betInput = document.getElementById("bet");
 
+	hitButton.onclick = hit;
+	standButton.onclick = stand;
+	doubleDownButton.onclick = doubleDown;
+	splitButton.onclick = split;
+
 	let statusText = "";
 	let actingHand = 0;
 
@@ -185,11 +190,11 @@
 		}
 	}
 
-	let shoe = new Shoe(6);
-	let dealersHand = undefined;
-	let bankroll = 1000;
-	let bettingStage = true;
-	let playerHands = [];
+	let shoe;
+	let dealersHand;
+	let bankroll;
+	let bettingStage;
+	let playerHands;
 
 	reset();
 
@@ -204,11 +209,6 @@
 			document.getElementById(stat).style.display = "inline";
 		}
 	}
-
-	hitButton.onclick = hit;
-	standButton.onclick = stand;
-	doubleDownButton.onclick = doubleDown;
-	splitButton.onclick = split;
 
 	function updateStats() {
 		document.getElementById("bankroll").innerText = bankroll;
@@ -371,10 +371,8 @@
 
 		hit();
 
-		if (!playerHands[actingHand].bust()) {
+		if (!bettingStage) {
 			stand();
-		} else {
-			finishGame();
 		}
 	}
 
