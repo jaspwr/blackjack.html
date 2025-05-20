@@ -3,56 +3,92 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Blackjack</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>blackjack.html</title>
 </head>
 
 <body>
-	<h2>Dealer's Hand:</h2>
-	<div id="dealer">
-	</div>
+	<div class="main-container">
+		<div id="intro">
+			<h1>blackjack.html ♥️♠️♦️♣️️</h1>
+			<p>
+				This is a simple, no-frills blackjack practice applet for basic strategy and Hi-Lo counting inspired by
+				<a href="https://brendansudol.github.io/card-counting-game/">brendansudol's Hi-Lo counting game</a>.
+			<p>
+			</p>
+			Basic strategy can be found in the toggleable table at the bottom of this page.
+			Hi-Lo counting is a simple but effective card counting system where a score is incremented for cards 2-6,
+			decremented for cards 10-A, and unchanged for cards 7-9.
+			<p>
+			</p>
+			The source code for this application can be found <a href="https://github.com/jaspwr/blackjack.html">on
+				GitHub</a>.
+			<p>
+			</p>
+			Press <code>Place</code> to begin the game.
+			</p>
+		</div>
 
-	<h2>Your Hand<span id="hands-plural"></span>:</h2>
-	<div id="yours">
-	</div>
+		<div id="cards" style="display: none">
+			<h2>Dealer's Hand:</h2>
+			<div id="dealer">
+			</div>
 
-	<div id="betting-options">
-		Bet: <input type="number" id="bet" value="10" min="1" max="1000">
-		<button id="deal" onclick="deal()">Place</button>
-	</div>
-	<span id="status-text" style="color: red; font-size: 20px;"></span>
-	<br>
-	<button id="hit">Hit</button>
-	<button id="stand">Stand</button>
-	<button id="split">Split</button>
-	<button id="double-down">Double Down</button>
+			<h2>Your Hand<span id="hands-plural"></span>:</h2>
+			<div id="yours">
+			</div>
+		</div>
 
-	<li>
-		<ul>Bankroll: <span id="bankroll"></span></ul>
-		<ul>Shoe Size: <span id="show-size"></span></ul>
-		<ul>Time Since Deal: <span id="time"></span></ul>
-		<ul>Hi-Lo RC:
-			<span id="hi-lo-rc" style="display:none">
-			</span>
-			<button onclick="toggleHiddenStat('hi-lo-rc')">
-				Show/Hide
-			</button>
+		<div id="betting-options" class="center-contents">
+			Bet: <input type="number" id="bet" value="10" min="1" max="1000">
+			<button id="deal" onclick="deal()">Place</button>
+		</div>
+		<div class="status-text-container center-contents">
+			<i id="status-text"></i>
+		</div>
+		<div class="center-contents">
+			<button id="hit">Hit</button>
+			<button id="stand">Stand</button>
+			<button id="split">Split</button>
+			<button id="double-down">Double Down</button>
+		</div>
+
+		<ul>
+			<li>Bankroll: <span id="bankroll"></span></li>
+			<li>Shoe Size: <span id="show-size"></span></li>
+			<li>Time Since Deal: <span id="time"></span></li>
+			<li>Hi-Lo RC:
+				<span id="hi-lo-rc" style="display:none">
+				</span>
+				<button onclick="toggleHiddenStat('hi-lo-rc')">
+					Show/Hide
+				</button>
+			</li>
+			<li>Hi-Lo TC:
+				<span id="hi-lo-tc" style="display: none">
+				</span>
+				<button onclick="toggleHiddenStat('hi-lo-tc')">
+					Show/Hide
+				</button>
+			</li>
 		</ul>
-		<ul>Hi-Lo TC:
-			<span id="hi-lo-tc" style="display: none">
-			</span>
-			<button onclick="toggleHiddenStat('hi-lo-tc')">
-				Show/Hide
-			</button>
-		</ul>
-	</li>
-	<button id="reset" onclick="reset()">Reset</button>
 
-	<div>
-		<button onclick="toggleHiddenStat('basic')">
-			Show/Hide Basic Strategy Table
-		</button>
-		<br>
-		<img id="basic" style="display: none" src="https://i.redd.it/s774t5z4jk761.png">
+		<div class="center-contents">
+			<button id="reset" onclick="reset()">Reset</button>
+		</div>
+
+		<hr>
+		<div>
+			<div class="center-contents">
+				<button onclick="toggleHiddenStat('basic')">
+					Show/Hide Basic Strategy Table
+				</button>
+			</div>
+			<br>
+			<div class="center-contents">
+				<img id="basic" style="display: none" src="https://i.redd.it/s774t5z4jk761.png">
+			</div>
+		</div>
 	</div>
 </body>
 
@@ -79,6 +115,14 @@
 
 	let statusText = "";
 	let actingHand = 0;
+
+	let shoe;
+	let dealersHand;
+	let bankroll;
+	let bettingStage;
+	let playerHands;
+
+	const hiddenStats = new Set();
 
 	class Shoe {
 		cards = [];
@@ -165,9 +209,9 @@
 			let value = 0;
 
 			let aces = 0;
-			for (const card_ of this.cards) {
-				const cardValue = card_.blackJackValue();
-				if (card_.isAce()) {
+			for (const card of this.cards) {
+				const cardValue = card.blackJackValue();
+				if (card.isAce()) {
 					aces++;
 				} else {
 					value += cardValue[0];
@@ -188,17 +232,15 @@
 		bust() {
 			return this.value(this.cards) > 21;
 		}
+
+		splitable() {
+			if (this.cards.length !== 2) return false;
+			if (this.cards[0].value !== this.cards[1].value) return false;
+			return true;
+		}
 	}
 
-	let shoe;
-	let dealersHand;
-	let bankroll;
-	let bettingStage;
-	let playerHands;
-
 	reset();
-
-	const hiddenStats = new Set();
 
 	function toggleHiddenStat(stat) {
 		if (hiddenStats.has(stat)) {
@@ -223,7 +265,7 @@
 		hitButton.disabled = bettingStage;
 		standButton.disabled = bettingStage;
 		doubleDownButton.disabled = bettingStage;
-		splitButton.disabled = bettingStage;
+		splitButton.disabled = bettingStage || !playerHands[actingHand].splitable();
 
 		document.getElementById("hands-plural").innerText = playerHands.length > 1 ? "s" : "";
 
@@ -258,21 +300,25 @@
 
 		img.style.width = `${width}px`;
 		img.style.height = `${width * CARD_ASPECT}px`;
-		img.style.position = "absolute";
-		img.style.left = `${x}px`;
 
-		return img;
+		// Place in container to overlap cards by 30px
+		const container = document.createElement("div");
+		container.style.width = `${width - 30}px`;
+		container.style.height = `${width * CARD_ASPECT}px`;
+		container.appendChild(img);
+
+		return container;
 	}
 
 	function createHandElement(hand) {
 		const div = document.createElement("div");
-		div.className = "hand";
-
 		if (!hand) return div;
 
+		div.className = "hand";
+
 		let x = 20;
-		for (const card_ of hand.cards) {
-			div.appendChild(createCardElement(card_, x));
+		for (const card of hand.cards) {
+			div.appendChild(createCardElement(card, x));
 			x += 60;
 		}
 
@@ -291,6 +337,10 @@
 	function deal() {
 		if (!bettingStage) return;
 
+		// Hide intro and show cards
+		document.getElementById("intro").style.display = "none";
+		document.getElementById("cards").style.display = "block";
+
 		statusText = "";
 
 		bet = parseInt(document.getElementById("bet").value);
@@ -307,12 +357,14 @@
 	}
 
 	function finishGame() {
-		actingHand++;
-		if (actingHand < playerHands.length) {
+		// Move to other hands if there are any
+		if (actingHand + 1 < playerHands.length) {
+			actingHand++;
 			updateStats();
 			return;
 		}
 
+		// Dealer's turn
 		while (dealersHand.value() < 17) dealersHand.push(...shoe.draw(1));
 
 		const dealerValue = dealersHand.value();
@@ -358,9 +410,7 @@
 
 		playerHands[actingHand].push(...shoe.draw(1));
 
-		if (playerHands[actingHand].bust()) {
-			finishGame();
-		}
+		if (playerHands[actingHand].bust()) finishGame();
 	}
 
 	function doubleDown() {
@@ -380,8 +430,7 @@
 		if (bettingStage) return;
 
 		const hand = playerHands[actingHand];
-		if (hand.cards.length !== 2) return;
-		if (hand.cards[0].value !== hand.cards[1].value) return;
+		if (!hand.splitable()) return;
 
 		let a = new Hand([hand.cards[0], ...shoe.draw(1)], hand.bet);
 		let b = new Hand([hand.cards[1], ...shoe.draw(1)], hand.bet);
@@ -410,12 +459,29 @@
 
 <style>
 	.card {
-		position: relative;
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
 	}
 
 	.hand {
+		display: flex;
+		gap: -30px;
 		height: 150px;
+	}
+
+	.status-text-container {
+		padding: 16px;
+	}
+
+	.center-contents {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.main-container {
+		max-width: 600px;
+		margin: auto;
 	}
 </style>
 
