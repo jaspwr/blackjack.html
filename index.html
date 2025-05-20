@@ -347,7 +347,7 @@
 
 		statusText = "";
 
-		bet = parseInt(document.getElementById("bet").value);
+		const bet = parseInt(document.getElementById("bet").value);
 		bankroll -= bet;
 
 		actingHand = 0;
@@ -383,16 +383,16 @@
 			if (playerHands.length > 1) statusText += `Hand ${index + 1}: `;
 
 			if (playerValue > 21) {
-				statusText = "You bust! Dealer wins.";
+				statusText = "You bust.";
 			} else if (dealerValue > 21) {
 				bankroll += bet * 2;
-				statusText += "Dealer busts! You win!";
+				statusText += "Dealer busts.";
 			} else if (dealerValue === playerValue) {
 				bankroll += bet;
-				statusText += "Push! No one wins.";
+				statusText += "Push.";
 			} else if (dealerValue < playerValue) {
 				bankroll += bet * 2;
-				statusText += "You win!";
+				statusText += "You win.";
 			} else {
 				statusText += "Dealer wins.";
 			}
@@ -545,11 +545,11 @@
 					previousCorrectAction = "D";
 					break;
 				default:
-					console.error(`Invalid id: ${id}`);
+					throw new Error(`Invalid id: ${id}`);
 			}
 		} catch (e) {
-			console.error(`Invalid key: ${key}`);
 			console.error(e);
+			previousCorrectAction = "?";
 		}
 	}
 
