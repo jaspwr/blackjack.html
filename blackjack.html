@@ -24,7 +24,7 @@
 
 	<button id="hit">Hit</button>
 	<button id="stand">Stand</button>
-	<!-- <button id="split">Split</button> -->
+	<button id="split">Split</button>
 	<button id="double-down">Double Down</button>
 
 	<li>
@@ -47,6 +47,13 @@
 		</ul>
 	</li>
 	<button id="reset" onclick="reset()">Reset</button>
+
+	<div>
+	<button onclick="toggleHiddenStat('basic')">
+		Show/Hide Basic Strategy Table
+	</button>
+	<img id="basic" style="display: none" src="https://i.redd.it/s774t5z4jk761.png">
+	</div>
 </body>
 
 <script>
@@ -60,7 +67,7 @@
 	const yourHandElem = document.getElementById("yours");
 	const hitButton = document.getElementById("hit");
 	const standButton = document.getElementById("stand");
-	// const splitButton = document.getElementById("split");
+	const splitButton = document.getElementById("split");
 	const doubleDownButton = document.getElementById("double-down");
 	const dealButton = document.getElementById("deal");
 	const betInput = document.getElementById("bet");
@@ -169,8 +176,8 @@
 		dealButton.disabled = !bettingStage;
 		betInput.disabled = !bettingStage;
 
-		yourHandElem.replaceChildren(hand(yourHand));
-		dealersHandElem.replaceChildren(hand(dealersHand.length === 1 ? [null, ...dealersHand] : dealersHand));
+		yourHandElem.replaceChildren(createHandElement(yourHand));
+		dealersHandElem.replaceChildren(createHandElement(dealersHand.length === 1 ? [null, ...dealersHand] : dealersHand));
 		
 		document.getElementById("status-text").innerText = statusText;
 	};
@@ -201,7 +208,7 @@
 		return value;
 	}
 
-	function card(card, x) {
+	function createCardElement(card, x) {
 		const img = document.createElement("img");
 
 		if (card === null) {
@@ -222,13 +229,13 @@
 		return img;
 	}
 
-	function hand(cards) {
+	function createHandElement(cards) {
 		const div = document.createElement("div");
 		div.className = "hand";
 
 		let x = 20;
 		for (const card_ of cards) {
-			div.appendChild(card(card_, x));
+			div.appendChild(createCardElement(card_, x));
 			x += 60;
 		}
 
@@ -285,6 +292,8 @@
 	}
 
 	function stand() {
+		if (bettingStage) return;
+
 		while (handValue(dealersHand) < 17) dealersHand.push(...shoe.draw(1));
 
 		finishGame();
@@ -339,15 +348,4 @@
 </style>
 
 </html>
-</style>
 
-</html>
-</style>
-
-</html>
-</style>
-
-</html>
-</style>
-
-</html>
