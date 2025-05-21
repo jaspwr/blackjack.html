@@ -352,7 +352,7 @@
 
 		actingHand = 0;
 		dealersHand = new Hand(shoe.draw(1));
-		playerHands = [new Hand(shoe.draw(2, bet))];
+		playerHands = [new Hand(shoe.draw(2), bet)];
 		shoe.lastDealTime = Date.now();
 
 		bettingStage = false;
