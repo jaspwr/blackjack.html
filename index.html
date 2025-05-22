@@ -355,6 +355,8 @@
 		playerHands = [new Hand(shoe.draw(2), bet)];
 		shoe.lastDealTime = Date.now();
 
+		if (playerHands[0].value() === 21) finishGame();
+
 		bettingStage = false;
 
 		updateStats();
@@ -384,6 +386,10 @@
 
 			if (playerValue > 21) {
 				statusText = "You bust.";
+
+			} else if (playerValue === 21) {
+				bankroll += bet * 2.5;
+				statusText = "Blackjack.";
 			} else if (dealerValue > 21) {
 				bankroll += bet * 2;
 				statusText += "Dealer busts.";
@@ -427,6 +433,7 @@
 
 		basicStrategy();
 
+		const bet = playerHands[actingHand].bet;
 		bankroll -= bet;
 		bet *= 2;
 
