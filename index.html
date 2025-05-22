@@ -14,11 +14,8 @@
 			<p>
 				This is a simple, no-frills blackjack practice applet for basic strategy and Hi-Lo counting inspired by
 				<a href="https://brendansudol.github.io/card-counting-game/">brendansudol's Hi-Lo counting game</a>.
-				Doubling is allowed and surrendering is not.
 			<p>
 			</p>
-			Basic strategy gives the best possible moves that can be made without additional information and can be
-			found in the toggleable table at the bottom of this page.
 			Hi-Lo counting is a simple but effective card counting system where a score is incremented for cards 2-6,
 			decremented for cards 10-A, and unchanged for cards 7-9.
 			<p>
@@ -433,7 +430,7 @@
 
 		basicStrategy();
 
-		const bet = playerHands[actingHand].bet;
+		let bet = playerHands[actingHand].bet;
 		bankroll -= bet;
 		bet *= 2;
 
